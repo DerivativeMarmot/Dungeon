@@ -1,9 +1,9 @@
 EXE=mysignal.dexe sigrec.dexe
 
 all: $(EXE)
-mysignal:
+mysignal.dexe:
 	gcc mysignal.c -o mysignal.dexe
-sigrec:
+sigrec.dexe:
 	gcc sigrec.c -o sigrec.dexe
 
 clean:

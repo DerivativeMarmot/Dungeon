@@ -11,17 +11,21 @@ int main(void)
     // child process
     if ((pid = fork()) == 0)
     {
-        if (execvp("./sigrec", NULL) == -1)
+        if (execvp("./sigrec.dexe", NULL) == -1)
         {
             perror("Failed to exe\n");
+            return 0;
         }
     }
     // parent process (here)
     else if (pid > 0)
         ;
     // fatal
-    else
+    else{
         perror("Failed to create a child\n");
+        return 0;
+    }
+        
 
     sleep(2);
     // send signal 
@@ -30,6 +34,7 @@ int main(void)
         kill(pid, SIGUSR1);
         sleep(1);
     }
+    kill(pid, SIGKILL);
 
     return 0;
 }

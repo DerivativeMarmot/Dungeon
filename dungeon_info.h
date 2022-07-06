@@ -46,4 +46,5 @@ struct Dungeon{
 
 //Call this method to begin running the dungeon. Valid pid's must be passed for it to work.
 void RunDungeon(pid_t wizard, pid_t rogue, pid_t barbarian);
+void signalReady();
 #endif

@@ -5,12 +5,14 @@ void asyncDisplay(char *str){
     //char out[sizeof(str)+1];
     //memset(out, 0, sizeof(out));
 
-    write(STDOUT_FILENO, str, sizeof(str));
+    write(STDOUT_FILENO, str, strlen(str));
 }
 
 void wizard_job(pid_t wizard){
     char encoded_context[] = "Rwqmpi xshec erh qeoi wsqifshc wqmpi!";
     char decoded_context[] = "smile today and make somebody smile!";
+    memset(dungeon->barrier.spell, 0, sizeof(dungeon->barrier.spell));
+    memset(dungeon->wizard.spell, 0, sizeof(dungeon->wizard.spell));
     asyncDisplay("Break this barrier: ");
     asyncDisplay(encoded_context);
     asyncDisplay("\n");
@@ -20,17 +22,20 @@ void wizard_job(pid_t wizard){
     sleep(SECONDS_TO_GUESS_BARRIER);
 
     if (!strcmp(dungeon->wizard.spell, decoded_context)){
-        asyncDisplay("SUCCESS\n");
+        //asyncDisplay("SUCCESS\n");
+        write(STDOUT_FILENO, "SUCCESS\n", strlen("SUCCESS\n"));
     }
     else{
-        asyncDisplay("FAILED\n");
+        write(STDOUT_FILENO, "FAILED\n", strlen("FAILED\n"));
     }
-    asyncDisplay("the magical phrase was: ");
+    //asyncDisplay("the magical phrase was: ");
     asyncDisplay(decoded_context);
 }
+
 void rogue_job(){
     ;
 }
+
 void barbarian_job(pid_t barbarian){
     asyncDisplay("Monster!!\n");
     dungeon->enemy.health = 5487695;
@@ -39,10 +44,11 @@ void barbarian_job(pid_t barbarian){
     sleep(SECONDS_TO_ATTACK);
 
     if (dungeon->barbarian.attack == dungeon->enemy.health){
-        asyncDisplay("SUCCESS\n");
+        write(STDOUT_FILENO, "SUCCESS\n", strlen("SUCCESS\n"));
     }
     else{
-        asyncDisplay("FAILED\n");
+        //asyncDisplay("FAILED\n");
+        write(STDOUT_FILENO, "FAILED\n", strlen("FAILED\n"));
     }
     asyncDisplay("Monster: \n");
     asyncDisplay("Barbarian: \n");

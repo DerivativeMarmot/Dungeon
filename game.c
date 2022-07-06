@@ -1,10 +1,10 @@
 #include "shmmgr.h"
 
-sem_t *sem_w_ready;
-sem_t *sem_r_ready;
-sem_t *sem_b_ready;
+// sem_t *sem_w_ready;
+// sem_t *sem_r_ready;
+// sem_t *sem_b_ready;
 
-void semSetup(){
+/*void semSetup(){
     // unlink all the semaphore before creating them just in case
     sem_unlink(dungeon_lever_one);
     sem_unlink(dungeon_lever_two);
@@ -47,11 +47,11 @@ void semSetup(){
     sem_close(sem_w);
     sem_close(sem_r);
     sem_close(sem_b);
-}
+}*/
 
 int main(void)
 {
-    semSetup(); // set up semaphore
+    //semSetup(); // set up semaphore
     
     allocShm(createShm(), DUNGEON_SIZE); // create shared memory
 
@@ -71,13 +71,13 @@ int main(void)
         }
     }
     
-    sem_wait(sem_w_ready); // wait for wizard to be ready to receive signal (important)
+    /*sem_wait(sem_w_ready); // wait for wizard to be ready to receive signal (important)
     sem_wait(sem_r_ready); // wait for rogue to be ready to receive signal (important)
     sem_wait(sem_b_ready); // wait for barbarian to be ready to receive signal (important)
     // close these sem, no longer useful
     sem_close(sem_w_ready);
     sem_close(sem_r_ready);
-    sem_close(sem_b_ready);
+    sem_close(sem_b_ready);*/
 
     RunDungeon(pid[0], pid[1], pid[2]);
 

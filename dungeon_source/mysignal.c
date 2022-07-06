@@ -7,7 +7,7 @@
 
 int main(void)
 {
-    pid_t pid;
+    /*pid_t pid;
     // child process
     if ((pid = fork()) == 0)
     {
@@ -34,9 +34,14 @@ int main(void)
         kill(pid, SIGUSR1);
         sleep(1);
     }
-    kill(pid, SIGKILL);
+    kill(pid, SIGKILL);*/
 
     asyncDisplay("end\n");
+    asyncDisplay("e312312 1nd\n");
+    asyncDisplay("encse feqrtegeqrd\n");
+    asyncDisplay("enddqweq dq\n");
+    asyncDisplay("en qrew d\n");
+    asyncDisplay("enqwe rqw4f d\n");
 
     return 0;
 }

@@ -5,11 +5,14 @@
 #include "dungeon_settings.h"
 
 //This is the name we will use for our shared memory.
-const char* dungeon_shm_name = "/DungeonMem";
+//const char* dungeon_shm_name = "/DungeonMem";
+#define dungeon_shm_name "/DungeonMem"
 
 //These are the names for the levers when getting the treasure at the end.
-const char* dungeon_lever_one = "/LeverOne";
-const char* dungeon_lever_two = "/LeverTwo";
+//const char* dungeon_lever_one = "/LeverOne";
+//const char* dungeon_lever_two = "/LeverTwo";
+#define dungeon_lever_one "/LeverOne"
+#define dungeon_lever_two "/LeverTwo"
 
 
 struct Barbarian{

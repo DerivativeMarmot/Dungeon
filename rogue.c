@@ -1,4 +1,4 @@
-#include "shmmgr.c"
+#include "shmmgr.h"
 
 struct Dungeon *dungeon;
 

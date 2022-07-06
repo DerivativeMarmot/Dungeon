@@ -1,4 +1,4 @@
-#include "shmmgr.c"
+#include "shmmgr.h"
 
 sem_t *sem_w_ready;
 sem_t *sem_r_ready;
@@ -57,7 +57,7 @@ int main(void)
 
     // create three runnable classes
     pid_t pid[3]; // wizard, rogue, barbarian
-    char *classes[3] = {"./wizard", "./rogue", "./barbarian"};
+    char *classes[3] = {"./wizard.dexe", "./rogue.dexe", "./barbarian.dexe"};
     for (int i = 0; i < 3; i++)
     {
         if ((pid[i] = fork()) == 0)
@@ -80,6 +80,16 @@ int main(void)
     sem_close(sem_b_ready);
 
     RunDungeon(pid[0], pid[1], pid[2]);
+
+    if (kill(pid[0], 0) == 0){
+        kill(pid[0], SIGKILL);
+    }
+    if (kill(pid[1], 0) == 0){
+        kill(pid[1], SIGKILL);
+    }
+    if (kill(pid[2], 0) == 0){
+        kill(pid[2], SIGKILL);
+    }
 
     return 0;
 }

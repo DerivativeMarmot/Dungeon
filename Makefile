@@ -1,18 +1,19 @@
-EXE=game wizard rogue barbarian
-
+EXE=game.dexe wizard.dexe rogue.dexe barbarian.dexe
+ORI_DUNGEON=dungeon.o
+SRC_DUNGEON=dungeon_source/dungeon.c
 all:$(EXE)
 
-game: game.c dungeon.o
-	gcc game.c dungeon_source/dungeon.o -o game -lrt -pthread
+game.dexe:
+	gcc game.c shmmgr.c $(SRC_DUNGEON) -o game.dexe -lrt -pthread
 
-wizard: wizard.c dungeon.o
-	gcc wizard.c -o wizard
+wizard.dexe:
+	gcc wizard.c shmmgr.c -o wizard.dexe
 
-rogue: rogue.c dungeon.o
-	gcc rogue.c -o rogue
+rogue.dexe:
+	gcc rogue.c shmmgr.c -o rogue.dexe
 
-barbarian: barbarian.c dungeon.o
-	gcc barbarian.c -o barbarian
+barbarian.dexe:
+	gcc barbarian.c shmmgr.c -o barbarian.dexe
 
 clean:
 	rm $(EXE) 

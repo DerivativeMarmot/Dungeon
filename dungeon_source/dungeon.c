@@ -2,7 +2,10 @@
 struct Dungeon *dungeon;
 
 void asyncDisplay(char *str){
-    write(STDOUT_FILENO, str, strlen(str));
+    //char out[sizeof(str)+1];
+    //memset(out, 0, sizeof(out));
+
+    write(STDOUT_FILENO, str, sizeof(str));
 }
 
 void wizard_job(pid_t wizard){
@@ -29,7 +32,7 @@ void rogue_job(){
     ;
 }
 void barbarian_job(pid_t barbarian){
-    asyncDisplay("Monster!!");
+    asyncDisplay("Monster!!\n");
     dungeon->enemy.health = 5487695;
 
     kill(barbarian, DUNGEON_SIGNAL);
@@ -41,20 +44,32 @@ void barbarian_job(pid_t barbarian){
     else{
         asyncDisplay("FAILED\n");
     }
-    asyncDisplay("Monster: ");
-    asyncDisplay("Barbarian: ");
+    asyncDisplay("Monster: \n");
+    asyncDisplay("Barbarian: \n");
 
 }
 
 void pidChecker(pid_t wizard, pid_t rogue, pid_t barbarian){
-    if (!kill(wizard, 0)){
+    if (kill(wizard, 0) == -1){
         asyncDisplay("wizard is not running\n");
     }
-    if (!kill(rogue, 0)){
+    if (!kill(rogue, 0) == -1){
         asyncDisplay("rogue is not running\n");
     }
-    if (!kill(barbarian, 0)){
+    if (!kill(barbarian, 0) == -1){
         asyncDisplay("barbarian is not running\n");
+    }
+}
+
+void killProcesses(pid_t wizard, pid_t rogue, pid_t barbarian){
+    if (kill(wizard, 0) == 0){
+        kill(wizard, SIGKILL);
+    }
+    if (kill(rogue, 0) == 0){
+        kill(rogue, SIGKILL);
+    }
+    if (kill(barbarian, 0) == 0){
+        kill(barbarian, SIGKILL);
     }
 }
 
@@ -62,6 +77,10 @@ void RunDungeon(pid_t wizard, pid_t rogue, pid_t barbarian){
     pidChecker(wizard, rogue, barbarian);
 
     dungeon = getShmAddr(openShm(), DUNGEON_SIZE);
+    barbarian_job(barbarian);
+    wizard_job(wizard);
+
+    killProcesses(wizard, rogue, barbarian);
     
 
 }

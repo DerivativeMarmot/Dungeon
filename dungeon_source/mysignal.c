@@ -3,7 +3,7 @@
 #include <unistd.h> // fork(), exec()
 #include <pthread.h>
 #include <string.h>
-
+#include "test.h"
 
 int main(void)
 {
@@ -35,6 +35,8 @@ int main(void)
         sleep(1);
     }
     kill(pid, SIGKILL);
+
+    asyncDisplay("end\n");
 
     return 0;
 }

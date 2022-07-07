@@ -4,16 +4,21 @@
 #include <string.h>
 
 
-void signalHandler(int signum){
-    write(STDOUT_FILENO, "signal received\n", strlen("signal received\n"));
-}
+/*void asyncDisplay(char *pattern, char* arg){
+    if (strlen(arg) != 0){
+        memset(buffer, 0, strlen(buffer));
+        sprintf(buffer, pattern, arg);
+    }
+    write(STDOUT_FILENO, pattern, strlen(pattern));
+}*/
+
 
 int main(void){
-    struct sigaction sa;
-    sa.sa_handler = signalHandler;
-    sa.sa_flags = SA_RESTART;
-    sigaction(SIGUSR1, &sa, NULL);
+    // struct sigaction sa;
+    // sa.sa_handler = signalHandler;
+    // sa.sa_flags = SA_RESTART;
+    // sigaction(SIGUSR1, &sa, NULL);
 
-    while(1) pause;
+    //while(1) pause;
     return 0;
 }

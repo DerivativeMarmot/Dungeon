@@ -7,6 +7,7 @@ int detachShm(void *addr, int size){
 		perror("munmap");
 		return 4;
 	}
+    //shm_unlink(dungeon_shm_name);
     return 1;
 }
 

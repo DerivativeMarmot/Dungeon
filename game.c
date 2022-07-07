@@ -78,6 +78,7 @@ int main(void)
     sem_close(sem_w_ready);
     sem_close(sem_r_ready);
     sem_close(sem_b_ready);*/
+    sleep(1);
 
     RunDungeon(pid[0], pid[1], pid[2]);
 

@@ -20,13 +20,22 @@ void asyncDisplay(char *pattern, char* argv){
 
 void asyncDisplayFloat(char *pattern, float argv){
     size_t len = (size_t)snprintf(NULL, 0, pattern, argv);
-    char *tempp = malloc(len);
+    char *tempp = malloc(len+1);
     sprintf(tempp, pattern, argv);
     tempp[len] = '\0';
     write(STDOUT_FILENO, tempp, len);
     free(tempp);
 }
 
+void asyncDisplayInt(char *pattern, int argv){
+    size_t len = (size_t)snprintf(NULL, 0, pattern, argv);
+    char *tempp = malloc(len+1);
+    sprintf(tempp, pattern, argv);
+    tempp[len] = '\0';
+    write(STDOUT_FILENO, tempp, len);
+    free(tempp);
+}
+/************************************************************************/
 void wizardDungeonJob(pid_t wizard){
     char encoded_context[] = "Rwqmpi xshec erh qeoi wsqifshc wqmpi!";
     char decoded_context[] = "smile today and make somebody smile!";
@@ -49,8 +58,9 @@ void wizardDungeonJob(pid_t wizard){
     asyncDisplay("barrier: %s\n", encoded_context);
     asyncDisplay("your answer: %s\n", dungeon->wizard.spell);
     asyncDisplay("right answer: %s\n", decoded_context);
+    putchar(10);
 }
-
+/************************************************************************/
 static void *rogueChild(void *n)
 {
    // this thread can be cancelled at any time
@@ -59,13 +69,9 @@ static void *rogueChild(void *n)
    float *target = n;
    *target = rand() % MAX_PICK_ANGLE;
    int old_pick = -1;
-   //float *pick = &dungeon->rogue.pick;
-   //char *dir = &dungeon->trap.direction;
    
    while (1)
    {
-        //asyncDisplayFloat("current pick: %.2f\n", dungeon->rogue.pick);
-        // check
         if (old_pick != dungeon->rogue.pick){
             asyncDisplayFloat("current pick: %.2f ===> ", dungeon->rogue.pick);
             asyncDisplayFloat("%.2f ===> ", *target);
@@ -121,8 +127,9 @@ void rogueDungeonJob(pid_t rogue){
     }
     asyncDisplayFloat("target: %.2f\n", target);
     asyncDisplayFloat("rogue's pick: %.2f\n", dungeon->rogue.pick);
+    putchar(10);
 }
-
+/************************************************************************/
 void barbarianDungeonJob(pid_t barbarian){
     asyncDisplay("Monster!!\n", "\0");
     dungeon->enemy.health = rand() % 2147483648;
@@ -136,10 +143,12 @@ void barbarianDungeonJob(pid_t barbarian){
     else{
         asyncDisplay("[;31mFAILED\033[0m\n", "\0");
     }
-    printf("Monster: %d\nBarbarian: %d\n", dungeon->enemy.health, dungeon->barbarian.attack);
-
+    //printf("Monster: %d\nBarbarian: %d\n", dungeon->enemy.health, dungeon->barbarian.attack);
+    asyncDisplayInt("Monster: %d\n", dungeon->enemy.health);
+    asyncDisplayInt("Barbarian: %d\n", dungeon->barbarian.attack);
+    putchar(10);
 }
-
+/************************************************************************/
 void pidChecker(pid_t wizard, pid_t rogue, pid_t barbarian){
     if (kill(wizard, 0) == -1){
         asyncDisplay("wizard is not running\n", "\0");
@@ -165,14 +174,41 @@ void killProcesses(pid_t wizard, pid_t rogue, pid_t barbarian){
     }
 }
 
+void runDungeonJobs(pid_t wizard, pid_t rogue, pid_t barbarian)
+{
+    int times = NUM_ROUNDS;
+    while (times)
+    {
+        if (ALLOW_BARBARIAN && times)
+        {
+            barbarianDungeonJob(barbarian);
+            barbarianDungeonJob(barbarian);
+            times -= 2;
+        }
+        if (ALLOW_WIZARD && times)
+        {
+            wizardDungeonJob(wizard);
+            wizardDungeonJob(wizard);
+            times -= 2;
+        }
+        if (ALLOW_ROGUE && times)
+        {
+            rogueDungeonJob(rogue);
+            rogueDungeonJob(rogue);
+            times -= 2;
+        }
+    }
+}
+/************************************************************************/
 void RunDungeon(pid_t wizard, pid_t rogue, pid_t barbarian){
     srand((unsigned)time(NULL));
     pidChecker(wizard, rogue, barbarian);
 
     dungeon = getShmAddr(openShm(), DUNGEON_SIZE);
-    barbarianDungeonJob(barbarian);
-    wizardDungeonJob(wizard);
-    rogueDungeonJob(rogue);
+    runDungeonJobs(wizard, rogue, barbarian);
+    // barbarianDungeonJob(barbarian);
+    // wizardDungeonJob(wizard);
+    // rogueDungeonJob(rogue);
 
     killProcesses(wizard, rogue, barbarian);
     

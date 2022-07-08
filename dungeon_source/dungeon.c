@@ -1,8 +1,10 @@
 #include "../shmmgr.h"
-#include <stdlib.h> // itoa()
+#include <pthread.h>
+#include <stdlib.h> // rand()
+#include <time.h>
 struct Dungeon *dungeon;
 
-void asyncDisplay(char *pattern, void* argv){
+void asyncDisplay(char *pattern, char* argv){
     if (strcmp(argv, "\0")){
         int res_len = strlen(pattern) + strlen(argv);
         char *tempp = malloc(res_len + 1);
@@ -16,11 +18,16 @@ void asyncDisplay(char *pattern, void* argv){
     }
 }
 
-void int2str(int n, char *s){
-    sprintf(s, "%d", n);
+void asyncDisplayFloat(char *pattern, float argv){
+    size_t len = (size_t)snprintf(NULL, 0, pattern, argv);
+    char *tempp = malloc(len);
+    sprintf(tempp, pattern, argv);
+    tempp[len] = '\0';
+    write(STDOUT_FILENO, tempp, len);
+    free(tempp);
 }
 
-void wizard_job(pid_t wizard){
+void wizardDungeonJob(pid_t wizard){
     char encoded_context[] = "Rwqmpi xshec erh qeoi wsqifshc wqmpi!";
     char decoded_context[] = "smile today and make somebody smile!";
     memset(dungeon->barrier.spell, 0, sizeof(dungeon->barrier.spell));
@@ -44,13 +51,81 @@ void wizard_job(pid_t wizard){
     asyncDisplay("right answer: %s\n", decoded_context);
 }
 
-void rogue_job(){
-    ;
+static void *rogueChild(void *n)
+{
+   // this thread can be cancelled at any time
+   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
+   // set this thread to be running in a infinite loop until it has been cenceled
+   float *target = n;
+   *target = rand() % MAX_PICK_ANGLE;
+   int old_pick = -1;
+   //float *pick = &dungeon->rogue.pick;
+   //char *dir = &dungeon->trap.direction;
+   
+   while (1)
+   {
+        //asyncDisplayFloat("current pick: %.2f\n", dungeon->rogue.pick);
+        // check
+        if (old_pick != dungeon->rogue.pick){
+            asyncDisplayFloat("current pick: %.2f ===> ", dungeon->rogue.pick);
+            asyncDisplayFloat("%.2f ===> ", *target);
+            if (dungeon->rogue.pick + LOCK_THRESHOLD < *target){
+                asyncDisplay("up\n", "0");
+                dungeon->trap.direction = 'u';
+            }
+            else if (dungeon->rogue.pick - LOCK_THRESHOLD > *target){
+                asyncDisplay("down\n", "0");
+                dungeon->trap.direction = 'd';
+            }
+            else{
+                asyncDisplay("Trap unlocked!\n", "\0");
+                dungeon->trap.direction = '-';
+                dungeon->trap.locked = false;
+                break;
+            }
+            old_pick = dungeon->rogue.pick;
+        }
+        usleep(TIME_BETWEEN_ROGUE_TICKS);
+   }
+   asyncDisplay("Finished before the timer...\n", "\0");
+   return NULL;
 }
 
-void barbarian_job(pid_t barbarian){
+void rogueDungeonJob(pid_t rogue){
+    dungeon->trap.direction = 't';
+    dungeon->trap.locked = true;
+    
+    
+    pthread_t child_thread;
+    float target;
+    int code;
+    code = pthread_create(&child_thread, NULL, rogueChild, &target);
+    if (code)
+        fprintf(stderr, "pthread_create failed with code %d\n", code);
+    
+    kill(rogue, DUNGEON_SIGNAL);
+    sleep(SECONDS_TO_PICK);
+
+    // when time is up, cancel the thread
+    if (pthread_cancel(child_thread) == 0)
+        printf("thread canceled\n");
+    else{
+        printf("thread not canceled\n");
+    }
+    // check if succeed
+    if (!dungeon->trap.locked){
+        asyncDisplay("\033[;32mSUCCESS\033[0m\n", "\0");
+    }
+    else{
+        asyncDisplay("\033[;31mFAILED\033[0m\n", "\0");
+    }
+    asyncDisplayFloat("target: %.2f\n", target);
+    asyncDisplayFloat("rogue's pick: %.2f\n", dungeon->rogue.pick);
+}
+
+void barbarianDungeonJob(pid_t barbarian){
     asyncDisplay("Monster!!\n", "\0");
-    dungeon->enemy.health = 31208923;
+    dungeon->enemy.health = rand() % 2147483648;
 
     kill(barbarian, DUNGEON_SIGNAL);
     sleep(SECONDS_TO_ATTACK);
@@ -61,12 +136,6 @@ void barbarian_job(pid_t barbarian){
     else{
         asyncDisplay("[;31mFAILED\033[0m\n", "\0");
     }
-    /*char str[10];
-    sprintf(str, "%d", dungeon->enemy.health);
-    asyncDisplay("Monster: %d\n", str);
-    memset(str, 0, sizeof(str));
-    sprintf(str, "%d", dungeon->barbarian.attack);
-    asyncDisplay("Barbarian: %d\n", str);*/
     printf("Monster: %d\nBarbarian: %d\n", dungeon->enemy.health, dungeon->barbarian.attack);
 
 }
@@ -97,11 +166,13 @@ void killProcesses(pid_t wizard, pid_t rogue, pid_t barbarian){
 }
 
 void RunDungeon(pid_t wizard, pid_t rogue, pid_t barbarian){
+    srand((unsigned)time(NULL));
     pidChecker(wizard, rogue, barbarian);
 
     dungeon = getShmAddr(openShm(), DUNGEON_SIZE);
-    barbarian_job(barbarian);
-    wizard_job(wizard);
+    barbarianDungeonJob(barbarian);
+    wizardDungeonJob(wizard);
+    rogueDungeonJob(rogue);
 
     killProcesses(wizard, rogue, barbarian);
     

@@ -82,7 +82,7 @@ int main(void)
 
     RunDungeon(pid[0], pid[1], pid[2]);
 
-    if (kill(pid[0], 0) == 0){
+    /*if (kill(pid[0], 0) == 0){
         kill(pid[0], SIGKILL);
     }
     if (kill(pid[1], 0) == 0){
@@ -90,7 +90,7 @@ int main(void)
     }
     if (kill(pid[2], 0) == 0){
         kill(pid[2], SIGKILL);
-    }
+    }*/
 
     return 0;
 }

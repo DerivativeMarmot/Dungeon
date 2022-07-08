@@ -87,13 +87,13 @@ int main()
     sigaction(SEMAPHORE_SIGNAL, &sa_sem, NULL);
 
     // ready to receive signals
-    sem_t *sem_r_ready = sem_open(ROG_READY_SEM, O_RDWR);
+    /*sem_t *sem_r_ready = sem_open(ROG_READY_SEM, O_RDWR);
     if (sem_r_ready == SEM_FAILED)
     {
         perror("sem_open/r_ready");
         exit(EXIT_FAILURE);
     }
-    sem_post(sem_r_ready);
+    sem_post(sem_r_ready);*/
 
     // continue when signal is received, otherwise pause
     while (1)

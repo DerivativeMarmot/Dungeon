@@ -181,24 +181,27 @@ void runDungeonJobs(pid_t wizard, pid_t rogue, pid_t barbarian)
     {
         if (ALLOW_BARBARIAN && times)
         {
-            for (int i = 0; i < MIN_BARBARIAN_RUNS > times ? MIN_BARBARIAN_RUNS : times; i++){
+            int count = MIN_BARBARIAN_RUNS < times ? MIN_BARBARIAN_RUNS : times;
+            for (int i = 0; i < count; i++){
                 barbarianDungeonJob(barbarian);
-                times--;
             }
+            times -= count;
         }
         if (ALLOW_WIZARD && times)
         {
-             for (int i = 0; i < MIN_WIZARD_RUNS > times ? MIN_WIZARD_RUNS : times; i++){
+            int count = MIN_WIZARD_RUNS < times ? MIN_WIZARD_RUNS : times;
+            for (int i = 0; i < count; i++){
                 wizardDungeonJob(wizard);
-                times--;
             }
+            times -= count;
         }
         if (ALLOW_ROGUE && times)
         {
-            for (int i = 0; i < MIN_ROGUE_RUNS > times ? MIN_ROGUE_RUNS : times; i++){
+            int count = MIN_ROGUE_RUNS < times ? MIN_ROGUE_RUNS : times;
+            for (int i = 0; i < count; i++){
                 rogueDungeonJob(rogue);
-                times--;
             }
+            times -= count;
         }
     }
 }

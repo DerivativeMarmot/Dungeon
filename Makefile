@@ -1,10 +1,10 @@
 EXE=game.dexe wizard.dexe rogue.dexe barbarian.dexe
 ORI_DUNGEON=dungeon.o
-SRC_DUNGEON=dungeon_source/dungeon.c
+MY_DUNGEON=dungeon_source/dungeon.c
 all:$(EXE)
 
 game.dexe:
-	gcc game.c shmmgr.c $(SRC_DUNGEON) -o game.dexe -lrt -pthread
+	gcc game.c shmmgr.c $(MY_DUNGEON) -o game.dexe -lrt -pthread
 
 wizard.dexe:
 	gcc wizard.c shmmgr.c -o wizard.dexe

@@ -4,6 +4,7 @@
 #include <time.h>
 struct Dungeon *dungeon;
 
+/************************************************************************/
 void asyncDisplay(char *pattern, char* argv){
     if (strcmp(argv, "\0")){
         int res_len = strlen(pattern) + strlen(argv);
@@ -65,7 +66,7 @@ static void *rogueChild(void *n)
 {
    // this thread can be cancelled at any time
    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
-   // set this thread to be running in a infinite loop until it has been cenceled
+
    float *target = n;
    *target = rand() % MAX_PICK_ANGLE;
    int old_pick = -1;
@@ -143,7 +144,6 @@ void barbarianDungeonJob(pid_t barbarian){
     else{
         asyncDisplay("[;31mFAILED\033[0m\n", "\0");
     }
-    //printf("Monster: %d\nBarbarian: %d\n", dungeon->enemy.health, dungeon->barbarian.attack);
     asyncDisplayInt("Monster: %d\n", dungeon->enemy.health);
     asyncDisplayInt("Barbarian: %d\n", dungeon->barbarian.attack);
     putchar(10);
@@ -153,10 +153,10 @@ void pidChecker(pid_t wizard, pid_t rogue, pid_t barbarian){
     if (kill(wizard, 0) == -1){
         asyncDisplay("wizard is not running\n", "\0");
     }
-    if (!kill(rogue, 0) == -1){
+    if (kill(rogue, 0) == -1){
         asyncDisplay("rogue is not running\n", "\0");
     }
-    if (!kill(barbarian, 0) == -1){
+    if (kill(barbarian, 0) == -1){
         asyncDisplay("barbarian is not running\n", "\0");
     }
 }
@@ -181,21 +181,24 @@ void runDungeonJobs(pid_t wizard, pid_t rogue, pid_t barbarian)
     {
         if (ALLOW_BARBARIAN && times)
         {
-            barbarianDungeonJob(barbarian);
-            barbarianDungeonJob(barbarian);
-            times -= 2;
+            for (int i = 0; i < MIN_BARBARIAN_RUNS > times ? MIN_BARBARIAN_RUNS : times; i++){
+                barbarianDungeonJob(barbarian);
+                times--;
+            }
         }
         if (ALLOW_WIZARD && times)
         {
-            wizardDungeonJob(wizard);
-            wizardDungeonJob(wizard);
-            times -= 2;
+             for (int i = 0; i < MIN_WIZARD_RUNS > times ? MIN_WIZARD_RUNS : times; i++){
+                wizardDungeonJob(wizard);
+                times--;
+            }
         }
         if (ALLOW_ROGUE && times)
         {
-            rogueDungeonJob(rogue);
-            rogueDungeonJob(rogue);
-            times -= 2;
+            for (int i = 0; i < MIN_ROGUE_RUNS > times ? MIN_ROGUE_RUNS : times; i++){
+                rogueDungeonJob(rogue);
+                times--;
+            }
         }
     }
 }
